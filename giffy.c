@@ -76,7 +76,7 @@ void write_metadata(gif_header header, gif_logical_screen_descriptor descriptor,
 	fputc(0x00, giffy);//width
 	fputc(0xFF, giffy);
 	fputc(0x00, giffy);//height
-	fputc(0x91, giffy);// packed
+	fputc(0x00, giffy);// packed /////////////////////////////
 	fputc(0x00, giffy);// background color index
 	fputc(0x00, giffy);//pixel aspect ratio
 	//fputc(descriptor.canvas_width, giffy);
@@ -84,7 +84,7 @@ void write_metadata(gif_header header, gif_logical_screen_descriptor descriptor,
 	//fputc(descriptor.packed_field, giffy);
 	//fputc(descriptor.pixel_aspect_ratio, giffy);
 
-	// global color table
+	/*// global color table
 	fputc(0xB0, giffy);
 	fputc(0x99, giffy);
 	fputc(0x4B, giffy);
@@ -100,7 +100,7 @@ void write_metadata(gif_header header, gif_logical_screen_descriptor descriptor,
 	fputc(0x9A, giffy);
 	fputc(0x9A, giffy);
 	fputc(0x75, giffy);
-	// end color table
+	// end color table*/
 
 	fputc(0x2C, giffy);
 	fputc(0x00, giffy);
