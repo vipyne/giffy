@@ -150,7 +150,6 @@ void write_extensions(FILE* giffy, char* secret_message)
   fputc(0x21, giffy); // extension start
   fputc(0xFE, giffy); // comment label
   fputc(0x00, giffy); // will be overwritten with length of secret message
-  // write_secret_message_symbols(giffy);
   int long length = write_secret_message(giffy, secret_message);
   write_secret_message_symbols(giffy);
   write_comment_end(giffy);
@@ -172,7 +171,6 @@ void parse_out_secret_message(FILE* source)
 {
   char c;
   char m;
-  int i = 0;
   char last_c;
   int print = 0;
 
@@ -180,15 +178,15 @@ void parse_out_secret_message(FILE* source)
     c = fgetc(source);
     if (c != '\0') {
       if (last_c == (signed char)0x21 && c == (signed char)0xFE) {
-        while (c != '_') {
+      	int length = fgetc(source);
+      	for(int i = 0; i < length; ++i) {
 	        c = fgetc(source);
-	        if (c != '_')
-          	printf("%c", c);
+	        // if (c != '_')
+          printf("%c", c);
         }
       }
       last_c = c;
     }
-    i++;
   }
   printf("\n");
   fclose(source);
