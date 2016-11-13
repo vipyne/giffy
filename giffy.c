@@ -8,19 +8,18 @@
 
 void write_secret_message_symbols(FILE* giffy)
 {
-  // flockfile(giffy);
+  flockfile(giffy);
   for (int i = 0; i < 4; ++i) {
-    fputc('_', giffy);
+    putc_unlocked('_', giffy);
   }
 }
 
 void write_comment_end(FILE* giffy)
 {
   char signature[7] = "vipyne";
-  // flockfile(giffy);
+  flockfile(giffy);
   for (int i = 0; signature[i] != '\0'; ++i ) {
-    // putc_unlocked(signature[i], giffy);
-    fputc(signature[i], giffy);
+    putc_unlocked(signature[i], giffy);
   };
   fputc(0x00, giffy);
 }
@@ -144,7 +143,6 @@ void write_extensions(FILE* giffy, char* secret_message)
     byte  19       : 0 (hex 0x00) a Data Sub-Block Terminator. */
   char app_extension[19] = {0x21, 0xFF, 0x0B, 'N', 'E', 'T', 'S', 'C', 'A', 'P', 'E', '2', '.', '0', '3', '1', '0', '0', '0'};
   for (int i = 0; i < 19; ++i) {
-
     fputc(app_extension[i], giffy);
   };
 
@@ -154,12 +152,12 @@ void write_extensions(FILE* giffy, char* secret_message)
   fputc(0x00, giffy); // will be overwritten with length of secret message
   // write_secret_message_symbols(giffy);
   int long length = write_secret_message(giffy, secret_message);
-  // write_secret_message_symbols(giffy);
+  write_secret_message_symbols(giffy);
   write_comment_end(giffy);
 
 
-  //  the -16 is to account for `____` && `____vipyne0x00`
-  fseek(giffy, -16 - length, SEEK_CUR); // rewind to length char
+  //  the -16 is to account for `____vipyne0x00`
+  fseek(giffy, -12 - length, SEEK_CUR); // rewind to length char
   fputc(length, giffy);
   fseek(giffy, 0L, SEEK_END);
 
