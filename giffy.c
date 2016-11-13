@@ -1,30 +1,6 @@
 
 #include <stdio.h>
-
 #include "giffy.h"
-
-
-
-
-// // struct gif_image_descriptor {
-// //   char start_image_descriptor;
-// //   short int x_start;
-// //   short int y_start;
-// //   short int image_width;
-// //   short int image_height;
-// //   char packed_field;
-// // };
-
-// void write_secret_message_symbols(FILE* giffy);
-// void write_comment_end(FILE* giffy);
-// void write_header(FILE* giffy);
-// void write_image_data(FILE* source, FILE* giffy);
-// int long write_secret_message(FILE* giffy, char* secret_message);
-// void write_extensions(FILE* giffy, char* secret_message);
-
-// // void read_input_file(FILE* source);
-
-// void parse_out_secret_message(FILE* source);
 
 
 /////  E N C O D E R  /////
@@ -250,32 +226,3 @@ void parse_out_secret_message(FILE* source)
 
 
 
-
-
-
-
-int main(int argc, char* argv[])
-{
-  FILE* source = fopen(argv[2], "rb");
-  FILE* giffy = fopen(argv[3], "wb");
-  char* secret_message = argv[4];
-
-  // TODO: stop putting off error handling
-   // return 1;
-   // printf(" ^^^^ oops and error occured\n");
-
-  printf("argv 1 %s\n", argv[1]);
-
-  if (*argv[1] == 'e') {
-    write_header(giffy);
-    write_image_data(source, giffy);
-    write_extensions(source, secret_message);
-
-    fclose(giffy);
-    printf("abbbbbbbbbbbbbb\n");
-  } else {
-    parse_out_secret_message(source);
-  }
-
-  return 0;
-}
