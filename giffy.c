@@ -28,10 +28,8 @@ void write_comment_end(FILE* giffy)
 void write_header(FILE* giffy)
 {
   //    G I F   H E A D E R
-	printf("wtfasdfasdfasdf\n");
   char gif_header[6] = {'G', 'I' ,'F' , '8', '9', 'a'};
   for (int i = 0; i < 6; ++i) {
-  	printf("wtf\n");
     fputc(gif_header[i], giffy);
   }
 
@@ -111,11 +109,8 @@ void write_image_data(FILE* source, FILE* giffy)
 
 int long write_secret_message(FILE* giffy, char* secret_message)
 {
-  printf("derp88888      8888\n");
   int long i;
   for (i = 0; secret_message[i] != '\0'; ++i) {
-        printf("poop");
-
     fputc(secret_message[i], giffy);
   }
   printf("%s\n", secret_message);
@@ -147,10 +142,8 @@ void write_extensions(FILE* giffy, char* secret_message)
                    number of times the loop should
                    be executed.
     byte  19       : 0 (hex 0x00) a Data Sub-Block Terminator. */
-        printf("$ $ WHAAH\n");
   char app_extension[19] = {0x21, 0xFF, 0x0B, 'N', 'E', 'T', 'S', 'C', 'A', 'P', 'E', '2', '.', '0', '3', '1', '0', '0', '0'};
   for (int i = 0; i < 19; ++i) {
-        printf("$ $ poop\n");
 
     fputc(app_extension[i], giffy);
   };
@@ -172,7 +165,6 @@ void write_extensions(FILE* giffy, char* secret_message)
 
   //    T R A I L E R
   fputc(0x3B, giffy);
-  printf("nerrdd\n" );
 
 }
 

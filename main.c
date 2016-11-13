@@ -16,10 +16,9 @@ int main(int argc, char* argv[])
   if (*argv[1] == 'e') {
     write_header(giffy);
     write_image_data(source, giffy);
-    write_extensions(source, secret_message);
+    write_extensions(giffy, secret_message);
 
     fclose(giffy);
-    printf("abbbbbbbbbbbbbb\n");
   } else {
     parse_out_secret_message(source);
   }
