@@ -172,46 +172,26 @@ void parse_out_secret_message(FILE* source)
 {
   char c;
   char m;
+  int i = 0;
   char last_c;
   int print = 0;
 
   while (!feof(source)) {
     c = fgetc(source);
-    // if (c != '\0') {
-          printf(":%c", c);
-      if (last_c == (signed char)0xFE && c == (signed char)0x1C) {
-        while (m != '_') {
-          m = fgetc(source);
-          printf("%c", m);
+    if (c != '\0') {
+      if (last_c == (signed char)0x21 && c == (signed char)0xFE) {
+        while (c != '_') {
+	        c = fgetc(source);
+	        if (c != '_')
+          	printf("%c", c);
         }
-        printf("poop");
       }
       last_c = c;
-        // printf("pooasfdp");
-
-    // }
+    }
+    i++;
   }
-
   printf("\n");
   fclose(source);
-
-  // int length = 1000;
-  // char buffer[length];
-  // rewind(source);
-  // fread(&buffer, 16, length, source);
-
-  // int i = 0;
-  // int done_reading = 0;
-
-  // while (i < length) {
-  // printf("%x", buffer[i]);
-  //  if (buffer[i] == 'f') {
-  //    if (buffer[i] == 0x1C) {
-  //      printf("%c", buffer[i]);
-  //    }
-  //  }
-  //  ++i;
-  // }
 };
 
 

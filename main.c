@@ -11,8 +11,6 @@ int main(int argc, char* argv[])
    // return 1;
    // printf(" ^^^^ oops and error occured\n");
 
-  printf("argv 1 %s\n", argv[1]);
-
   if (*argv[1] == 'e') {
     write_header(giffy);
     write_image_data(source, giffy);
