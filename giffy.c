@@ -24,6 +24,9 @@ void write_comment_end(FILE* giffy)
   fputc(0x00, giffy);
 }
 
+// global for now because I HAVE NO IDEA WHAT IM DOING
+char color_table[6] = {0x20, 0x79, 0x4B, 0x00, 0x00, 0x4B};
+
 void write_header(FILE* giffy)
 {
   //    G I F   H E A D E R
@@ -41,13 +44,15 @@ void write_header(FILE* giffy)
   fputc(0xFF, giffy);
   fputc(0x00, giffy);// height
   fputc(0xFF, giffy);
-  fputc(0x80, giffy);// packed /// color table options - whether or not has
   // _ color table bool | ___ resolution | _ sort flag | ___ size of table
+  // size of table == 000 => 2 colors;
+  fputc(0x80, giffy);// packed /// color table options - whether or not has
   fputc(0x01, giffy);// background color index
   fputc(0x00, giffy);// pixel aspect ratio
 
   //    C O L O R   T A B L E
   // global color table
+  // TODO: iterate through the color_table you just made
   fputc(0x20, giffy);
   fputc(0x79, giffy);
   fputc(0x4B, giffy);
@@ -80,61 +85,110 @@ void write_header(FILE* giffy)
   // gif_image_descriptor image_descriptor;
   // image_descriptor.image_width = 0xFF; // need to get image dim... ffmpeg?  vips?
   // image_descriptor.image_height = 0xFF;
-
 }
+
+void generate_index_stream(FILE* source, char* index_stream)
+{
+  int length = 500;
+  char buffer[length];
+  fread(&buffer, 1, length, source);
+
+  printf("18th byte : %c \n", buffer[17]);
+  printf("start: 19th byte : %c \n", buffer[18]);
+
+  int output_color_table_index = 0;
+	for (int i = 18; output_color_table_index < 10; i += 3) {
+  	char rgb_pattern[3];
+  	rgb_pattern[0] = buffer[i];
+  	rgb_pattern[1] = buffer[i + 1];
+  	rgb_pattern[2] = buffer[i + 2];
+
+  	// printf("color_table[0] : %d\n", color_table[0]);
+  	// printf("color_table[3] : %d\n", color_table[3]);
+  	printf("rgb_pattern[0] : %d\n", rgb_pattern[i]);
+  	if (rgb_pattern[0] == color_table[0]) { // first color
+  		index_stream[output_color_table_index] = 0;
+  	}
+  	if (rgb_pattern[0] == color_table[3]) { // second color
+  		index_stream[output_color_table_index] = 1;
+  	}
+  	printf("i_m: %d |", index_stream[output_color_table_index]);
+  	output_color_table_index++;
+  }
+  index_stream[10] = '\0';
+  printf("\n");
+}
+
+int verb_hash(char* key_input_color, int hash_table_length) {
+	int value = 0;
+	// colors are are array of 3 chars RGB
+	for (int i = 0; i < 3; ++i) {
+		value += key_input_color[i];
+	}
+	// to ensure key is not outside table length;
+	return value % hash_table_length;
+}
+
+// struct key_value_ll {
+// 	int key;
+// 	char value[3];
+// 	struct key_value_ll* next;
+// }
 
 void write_image_data(FILE* source, FILE* giffy)
 {
   //    I M A G E   D A T A
-  int length = 22;
   fputc(0x02, giffy); // LZW min code size - 2
   fputc(0x16, giffy); // number of bytes in data sub-block
 
-  char buffer[length];
-  fread(&buffer, 1, length, source);
+  char index_stream[11];
 
-  int i = 0;
-  int writing = 0;
+  generate_index_stream(source, index_stream);
+  // compress_image(giffy, index_stream);
 
-  while (writing < length) {
-    if (buffer[i] > 0x01) {
-      fputc(buffer[i], giffy);
-      ++writing;
-    }
-    ++i;
-  }
-  fputc(0x00, giffy); // end image data
+  // // array of indexes to color table
+  // char dictionary_array[256] = {0x00, '1', ' ', '_'};
+  // char compression_stream[256];
+  // char empty_pattern[10];
+  // char pattern;
+
+  // for (int i = 0; i < dictionary_array.length; ++i) {
+  // 	fputc(dictionary_array[i], giffy);
+  // }
+
+  // for (int i = 0; i < compression_stream.length; ++i) {
+  //   fputc(compression_stream[i], giffy); // in bits
+  // }
+
+  fputc(0x00, giffy); // end image data | end data sub block
 }
 
-// Index   Entry
-//   0       a
-//   1       b
-//   2       d
-//   3       n
-//   4       _ (space)
-
-
-void compress_image(FILE* source, FILE* giffy, char* dictionary)
+void compress_image(FILE* giffy, char* index_stream)
 {
-//   fputc(0x02, giffy); // LZW min code size - 2
-//   fputc(0x22, giffy); // number of bytes in data sub-block
+	// // LZW //////
 
-//   // for (int i = 0; i < 5; ++i) {
-//   // 	fputc()
-//   // }
+	// char index_buffer[10];
+	// char ch;
+	// index_buffer[bi] = index_stream[0];
 
-// 	char pattern[];
-// 	char c;
+	// for (int i = 1; index_stream[i] != '\0'; ++i) {
+	// 	char new_index_buffer[] = index_buffer;
 
-// 	// dictionary
 
-// 	while (!feof(source)) {
-//     c = fgetc(source);
-//     if (c )
-//   }
 
-// fputc(0x00, giffy); // end data sub block
+	// 	index_buffer[i]
+	// 	ch = index_stream[i];
+	// 	char new_index_buffer = {ch, index_buffer[]};
 
+
+	// 	if (dictionary contains index_buffer) {
+	// 		index_buffer
+	// 	} else {
+	// 		fputc(s+ch, giffy);
+	// 		// add s+ch to dictionary
+	// 		s = ch;
+	// 	}
+	// };
 }
 
 // void read_input_file(FILE* source, callback)
