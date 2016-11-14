@@ -37,29 +37,33 @@ void write_header(FILE* giffy)
   char packed_field;
   char pixel_aspect_ratio;*/
   //    L O G I C A L   S C R E E N   D E S C R I P T O R
-  fputc(0xFF, giffy);
   fputc(0x00, giffy);// width
   fputc(0xFF, giffy);
   fputc(0x00, giffy);// height
-  fputc(0x00, giffy);// packed /// color table options - whether or not has
-  fputc(0x00, giffy);// background color index
+  fputc(0xFF, giffy);
+  fputc(0x80, giffy);// packed /// color table options - whether or not has
+  // _ color table bool | ___ resolution | _ sort flag | ___ size of table
+  fputc(0x01, giffy);// background color index
   fputc(0x00, giffy);// pixel aspect ratio
 
   //    C O L O R   T A B L E
-  /*// global color table
-  fputc(0xB0, giffy);
-  fputc(0x99, giffy);
+  // global color table
+  fputc(0x20, giffy);
+  fputc(0x79, giffy);
   fputc(0x4B, giffy);
+
   fputc(0x00, giffy);
   fputc(0x00, giffy);
   fputc(0x4B, giffy);
-  fputc(0xBB, giffy);
-  fputc(0x13, giffy);
-  fputc(0x9A, giffy);
-  fputc(0x9A, giffy);
-  fputc(0x9A, giffy);
-  fputc(0x75, giffy);
-  // end color table*/
+
+  // fputc(0xBB, giffy);
+  // fputc(0x13, giffy);
+  // fputc(0x2A, giffy);
+
+  // fputc(0x9A, giffy);
+  // fputc(0x9A, giffy);
+  // fputc(0x75, giffy);
+  // end color table
 
   //    I M A G E   D E S C R I P T O R
   fputc(0x2C, giffy);
@@ -82,9 +86,9 @@ void write_header(FILE* giffy)
 void write_image_data(FILE* source, FILE* giffy)
 {
   //    I M A G E   D A T A
-  int length = 100;
+  int length = 22;
   fputc(0x02, giffy); // LZW min code size - 2
-  fputc(0xFF, giffy); // number of bytes in data sub-block
+  fputc(0x16, giffy); // number of bytes in data sub-block
 
   char buffer[length];
   fread(&buffer, 1, length, source);
@@ -93,13 +97,44 @@ void write_image_data(FILE* source, FILE* giffy)
   int writing = 0;
 
   while (writing < length) {
-    if (buffer[i] > 0x00) {
+    if (buffer[i] > 0x01) {
       fputc(buffer[i], giffy);
       ++writing;
     }
     ++i;
   }
   fputc(0x00, giffy); // end image data
+}
+
+// Index   Entry
+//   0       a
+//   1       b
+//   2       d
+//   3       n
+//   4       _ (space)
+
+
+void compress_image(FILE* source, FILE* giffy, char* dictionary)
+{
+//   fputc(0x02, giffy); // LZW min code size - 2
+//   fputc(0x22, giffy); // number of bytes in data sub-block
+
+//   // for (int i = 0; i < 5; ++i) {
+//   // 	fputc()
+//   // }
+
+// 	char pattern[];
+// 	char c;
+
+// 	// dictionary
+
+// 	while (!feof(source)) {
+//     c = fgetc(source);
+//     if (c )
+//   }
+
+// fputc(0x00, giffy); // end data sub block
+
 }
 
 // void read_input_file(FILE* source, callback)
