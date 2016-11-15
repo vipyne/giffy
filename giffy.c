@@ -88,8 +88,9 @@ void write_header(FILE* giffy)
   // image_descriptor.image_height = 0xFF;
 }
 
-void generate_index_stream(FILE* source, char* index_stream)
+void generate_index_stream(FILE* source, int* index_stream)
 {
+	printf("generate_index_stream\n");
   int length = 500;
   char buffer[length];
   fread(&buffer, 1, length, source);
@@ -126,37 +127,57 @@ int verb_hash(char* index_buffer, int buff_idx, int hash_table_length)
 	return value % hash_table_length;
 }
 
-void init_dictionary(struct key_value_ll* dictionary_hash)
+void init_dictionary(struct Dictionary* dictionary_hash)
 {
-	struct key_value_ll first_color;
-  first_color.key = 0;
-  first_color.value[0] = 0;
-  first_color.next = NULL;
+	printf("init_dictionary\n");
+	// struct key_value_ll first_color;
+ //  first_color.key = 0;
+ //  first_color.value[0] = 0;
+ //  first_color.next = NULL;
 
-  struct key_value_ll second_color;
-  second_color.key = 1;
-  second_color.value[0] = 1;
-  second_color.next = NULL;
+  // struct key_value_ll second_color;
+  // second_color.key = 1;
+  // second_color.value[0] = 1;
+  // second_color.next = NULL;
 
-  struct key_value_ll clear_color;
-  clear_color.key = 2;
-  clear_color.value[0] = ' ';
-  clear_color.next = NULL;
+  // struct key_value_ll clear_color;
+  // clear_color.key = 2;
+  // clear_color.value[0] = ' ';
+  // clear_color.next = NULL;
 
-  struct key_value_ll end_of_data;
-  end_of_data.key = 3;
-  end_of_data.value[0] = '_';
-  end_of_data.next = NULL;
+  // struct key_value_ll end_of_data;
+  // end_of_data.key = 3;
+  // end_of_data.value[0] = '_';
+  // end_of_data.next = NULL;
 
-  dictionary_hash[0] = first_color;
-  dictionary_hash[1] = second_color;
-  dictionary_hash[2] = clear_color;
-  dictionary_hash[3] = end_of_data;
+
+	struct key_value_ll* first_color = (struct key_value_ll*)malloc(sizeof (struct key_value_ll) );
+  first_color->key = 0;
+  first_color->value[0] = 0;
+
+	printf("hashy\n");
+	first_color->next = dictionary_hash->hash_table[0];
+	printf("hashy22\n");
+	dictionary_hash->hash_table[0] = first_color;
+
+	printf("hashy33\n");
+	dictionary_hash->total_number++;
+
+	// e->next = d->table[h];
+ // 	d->table[h] = e;
+ // 	d->n++;
+
+
+	printf(" firrrst init_dictionary\n");
+  // dictionary_hash[1] = second_color;
+  // dictionary_hash[2] = clear_color;
+  // dictionary_hash[3] = end_of_data;
 //   dictionary_hash = {first_color, second_color, clear_color, end_of_data};
 }
 
-void compress_image(FILE* giffy, char* index_stream, struct key_value_ll* dictionary_hash)
+void compress_image(FILE* giffy, int* index_stream, struct Dictionary* dictionary_hash)
 {
+	printf("start compress_image\n");
 	////// LZW //////
 	int hash_table_length = 4;
 	char index_buffer[102];
@@ -164,38 +185,42 @@ void compress_image(FILE* giffy, char* index_stream, struct key_value_ll* dictio
 	int buff_idx = 0;
 	fputc(0x02, giffy); // clear code
 	index_buffer[0] = index_stream[0];
+	printf("before loop\n");
 
 	for (int i = 1; index_stream[i] != '\0'; ++i) {
-		char k = index_stream[i];
+		printf("start loop\n");
+		int k = index_stream[i];
 
 		index_buffer[buff_idx + 1] = k;
 
 		int hash_key = verb_hash(index_buffer, buff_idx, hash_table_length);
 
-		if (dictionary_hash[hash_key].key > -1) {
-			index_buffer[buff_idx + 1] = k;
-			buff_idx++;
-		} else {
-			fputc(hash_key, giffy);
+		// if (dictionary_hash[hash_key].key > -1) {
+		// 	printf("if yes\n");
+		// 	index_buffer[buff_idx + 1] = k;
+		// 	buff_idx++;
+		// } else {
+		// 	printf("if no\n");
+		// 	fputc(hash_key, giffy);
 
-			// create new pattern struct entry for dictionary
-			struct key_value_ll* new_entry = (struct key_value_ll*)malloc(sizeof (struct key_value_ll) );
-			new_entry->key = hash_key;
-			index_buffer[buff_idx + 1] = '\0';
-			for (int i = 0; index_buffer[i] != '\0'; ++i) {
-				new_entry->value[i] = index_buffer[i];
-			}
-			new_entry->next = NULL;
+		// 	// create new pattern struct entry for dictionary
+		// 	struct key_value_ll* new_entry = (struct key_value_ll*)malloc(sizeof (struct key_value_ll) );
+		// 	new_entry->key = hash_key;
+		// 	index_buffer[buff_idx + 1] = '\0';
+		// 	for (int i = 0; index_buffer[i] != '\0'; ++i) {
+		// 		new_entry->value[i] = index_buffer[i];
+		// 	}
+		// 	new_entry->next = NULL;
 
-			// add new pattern struct to dictionary
-			dictionary_hash[hash_key] = *new_entry;
+		// 	// add new pattern struct to dictionary
+		// 	dictionary_hash[hash_key] = *new_entry;
 
-			hash_table_length++;
-			buff_idx = 0;
-			index_buffer[buff_idx] = k;
-			free (new_entry);
-			// k = NULL;
-		}
+		// 	hash_table_length++;
+		// 	buff_idx = 0;
+		// 	index_buffer[buff_idx] = k;
+		// 	free (new_entry);
+		// 	// k = NULL;
+		// }
 
 	};
 	// fputc(index_buffer, giffy); // need to do this but ug
@@ -203,17 +228,21 @@ void compress_image(FILE* giffy, char* index_stream, struct key_value_ll* dictio
 
 void write_image_data(FILE* source, FILE* giffy)
 {
+	printf("start write_image_data\n");
   //    I M A G E   D A T A
   fputc(0x02, giffy); // LZW min code size - 2
   fputc(0x16, giffy); // number of bytes in data sub-block
 
-  char index_stream[102];
+  int index_stream[102];
 
-  struct key_value_ll* dictionary_hash;
+  struct Dictionary dictionary_hash;
 
-  init_dictionary(dictionary_hash);
+  init_dictionary(&dictionary_hash);
+	printf("i predict this wont print out\n");
   generate_index_stream(source, index_stream);
-  compress_image(giffy, index_stream, dictionary_hash);
+	printf("before compress_image\n");
+
+  compress_image(giffy, index_stream, &dictionary_hash);
 
   fputc(0x00, giffy); // end image data | end data sub block
 }
