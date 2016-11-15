@@ -1,5 +1,5 @@
-
 #include <stdio.h>
+#include <stdlib.h>
 #include "giffy.h"
 
 
@@ -26,6 +26,7 @@ void write_comment_end(FILE* giffy)
 
 // global for now because I HAVE NO IDEA WHAT IM DOING
 char color_table[6] = {0x20, 0x79, 0x4B, 0x00, 0x00, 0x4B};
+
 
 void write_header(FILE* giffy)
 {
@@ -93,18 +94,13 @@ void generate_index_stream(FILE* source, char* index_stream)
   char buffer[length];
   fread(&buffer, 1, length, source);
 
-  printf("18th byte : %c \n", buffer[17]);
-  printf("start: 19th byte : %c \n", buffer[18]);
-
   int output_color_table_index = 0;
-	for (int i = 18; output_color_table_index < 10; i += 3) {
+	for (int i = 18; output_color_table_index < 101; i += 3) {
   	char rgb_pattern[3];
   	rgb_pattern[0] = buffer[i];
   	rgb_pattern[1] = buffer[i + 1];
   	rgb_pattern[2] = buffer[i + 2];
 
-  	// printf("color_table[0] : %d\n", color_table[0]);
-  	// printf("color_table[3] : %d\n", color_table[3]);
   	printf("rgb_pattern[0] : %d\n", rgb_pattern[i]);
   	if (rgb_pattern[0] == color_table[0]) { // first color
   		index_stream[output_color_table_index] = 0;
@@ -115,25 +111,95 @@ void generate_index_stream(FILE* source, char* index_stream)
   	printf("i_m: %d |", index_stream[output_color_table_index]);
   	output_color_table_index++;
   }
-  index_stream[10] = '\0';
+  index_stream[101] = '\0';
   printf("\n");
 }
 
-int verb_hash(char* key_input_color, int hash_table_length) {
+int verb_hash(char* index_buffer, int buff_idx, int hash_table_length)
+{
 	int value = 0;
 	// colors are are array of 3 chars RGB
-	for (int i = 0; i < 3; ++i) {
-		value += key_input_color[i];
+	for (int i = 0; i < buff_idx; ++i) {
+		value += index_buffer[i];
 	}
 	// to ensure key is not outside table length;
 	return value % hash_table_length;
 }
 
-// struct key_value_ll {
-// 	int key;
-// 	char value[3];
-// 	struct key_value_ll* next;
-// }
+void init_dictionary(struct key_value_ll* dictionary_hash)
+{
+	struct key_value_ll first_color;
+  first_color.key = 0;
+  first_color.value[0] = 0;
+  first_color.next = NULL;
+
+  struct key_value_ll second_color;
+  second_color.key = 1;
+  second_color.value[0] = 1;
+  second_color.next = NULL;
+
+  struct key_value_ll clear_color;
+  clear_color.key = 2;
+  clear_color.value[0] = ' ';
+  clear_color.next = NULL;
+
+  struct key_value_ll end_of_data;
+  end_of_data.key = 3;
+  end_of_data.value[0] = '_';
+  end_of_data.next = NULL;
+
+  dictionary_hash[0] = first_color;
+  dictionary_hash[1] = second_color;
+  dictionary_hash[2] = clear_color;
+  dictionary_hash[3] = end_of_data;
+//   dictionary_hash = {first_color, second_color, clear_color, end_of_data};
+}
+
+void compress_image(FILE* giffy, char* index_stream, struct key_value_ll* dictionary_hash)
+{
+	////// LZW //////
+	int hash_table_length = 4;
+	char index_buffer[102];
+	struct key_value_ll dict;
+	int buff_idx = 0;
+	fputc(0x02, giffy); // clear code
+	index_buffer[0] = index_stream[0];
+
+	for (int i = 1; index_stream[i] != '\0'; ++i) {
+		char k = index_stream[i];
+
+		index_buffer[buff_idx + 1] = k;
+
+		int hash_key = verb_hash(index_buffer, buff_idx, hash_table_length);
+
+		if (dictionary_hash[hash_key].key > -1) {
+			index_buffer[buff_idx + 1] = k;
+			buff_idx++;
+		} else {
+			fputc(hash_key, giffy);
+
+			// create new pattern struct entry for dictionary
+			struct key_value_ll* new_entry = (struct key_value_ll*)malloc(sizeof (struct key_value_ll) );
+			new_entry->key = hash_key;
+			index_buffer[buff_idx + 1] = '\0';
+			for (int i = 0; index_buffer[i] != '\0'; ++i) {
+				new_entry->value[i] = index_buffer[i];
+			}
+			new_entry->next = NULL;
+
+			// add new pattern struct to dictionary
+			dictionary_hash[hash_key] = *new_entry;
+
+			hash_table_length++;
+			buff_idx = 0;
+			index_buffer[buff_idx] = k;
+			free (new_entry);
+			// k = NULL;
+		}
+
+	};
+	// fputc(index_buffer, giffy); // need to do this but ug
+}
 
 void write_image_data(FILE* source, FILE* giffy)
 {
@@ -141,55 +207,17 @@ void write_image_data(FILE* source, FILE* giffy)
   fputc(0x02, giffy); // LZW min code size - 2
   fputc(0x16, giffy); // number of bytes in data sub-block
 
-  char index_stream[11];
+  char index_stream[102];
 
+  struct key_value_ll* dictionary_hash;
+
+  init_dictionary(dictionary_hash);
   generate_index_stream(source, index_stream);
-  // compress_image(giffy, index_stream);
-
-  // // array of indexes to color table
-  // char dictionary_array[256] = {0x00, '1', ' ', '_'};
-  // char compression_stream[256];
-  // char empty_pattern[10];
-  // char pattern;
-
-  // for (int i = 0; i < dictionary_array.length; ++i) {
-  // 	fputc(dictionary_array[i], giffy);
-  // }
-
-  // for (int i = 0; i < compression_stream.length; ++i) {
-  //   fputc(compression_stream[i], giffy); // in bits
-  // }
+  compress_image(giffy, index_stream, dictionary_hash);
 
   fputc(0x00, giffy); // end image data | end data sub block
 }
 
-void compress_image(FILE* giffy, char* index_stream)
-{
-	// // LZW //////
-
-	// char index_buffer[10];
-	// char ch;
-	// index_buffer[bi] = index_stream[0];
-
-	// for (int i = 1; index_stream[i] != '\0'; ++i) {
-	// 	char new_index_buffer[] = index_buffer;
-
-
-
-	// 	index_buffer[i]
-	// 	ch = index_stream[i];
-	// 	char new_index_buffer = {ch, index_buffer[]};
-
-
-	// 	if (dictionary contains index_buffer) {
-	// 		index_buffer
-	// 	} else {
-	// 		fputc(s+ch, giffy);
-	// 		// add s+ch to dictionary
-	// 		s = ch;
-	// 	}
-	// };
-}
 
 // void read_input_file(FILE* source, callback)
 // {
@@ -243,7 +271,6 @@ void write_extensions(FILE* giffy, char* secret_message)
   write_secret_message_symbols(giffy);
   write_comment_end(giffy);
 
-
   //  the -16 is to account for `____vipyne0x00`
   fseek(giffy, -12 - length, SEEK_CUR); // rewind to length char
   fputc(length, giffy);
@@ -251,7 +278,6 @@ void write_extensions(FILE* giffy, char* secret_message)
 
   //    T R A I L E R
   fputc(0x3B, giffy);
-
 }
 
 /////  D E C O D E R  /////
@@ -270,7 +296,6 @@ void parse_out_secret_message(FILE* source)
       	int length = fgetc(source);
       	for(int i = 0; i < length; ++i) {
 	        c = fgetc(source);
-	        // if (c != '_')
           printf("%c", c);
         }
       }
