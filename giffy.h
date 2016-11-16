@@ -4,5 +4,5 @@ void write_header(FILE* giffy);
 void copy_gif_file(FILE* source, FILE* giffy);
 int long write_secret_message(FILE* giffy, char* secret_message);
 void write_entire_comment(FILE* giffy, char* secret_message);
-
 void parse_out_secret_message(FILE* source);
+void print_directions(void);

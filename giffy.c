@@ -99,5 +99,17 @@ void parse_out_secret_message(FILE* source)
   printf("\n");
 };
 
+/////  E R R O R S  /////
 
-
+void print_directions(void) {
+  printf("\n");
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("To encode a message:\n");
+  printf("$ ./giffy.exe e [input-image-file] [output-filename] [message-string]\n");
+  printf("Ensure `message-string` is wrapped in quotes\n");
+  printf("\n");
+  printf("To decode an image:\n");
+  printf("$ ./giffy.exe d [input-image-file]\n");
+  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+  printf("\n");
+}
