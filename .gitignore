@@ -37,7 +37,7 @@
 .DS_Store
 
 # silly me
-*.gif
+allthegifs/*
 *.png
 *.jpg
 lzw-ex-from-internet.c
