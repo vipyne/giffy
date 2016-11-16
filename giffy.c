@@ -24,9 +24,6 @@ void write_comment_end(FILE* giffy)
   fputc(0x00, giffy);
 }
 
-// global for now because I HAVE NO IDEA WHAT IM DOING
-char color_table[6] = {0x20, 0x79, 0x4B, 0x00, 0x00, 0x4B};
-
 void copy_gif_file(FILE* source, FILE* giffy)
 {
 	fseek(source, 0, SEEK_END);
