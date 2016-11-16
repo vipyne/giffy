@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include "giffy.h"
 
-
 /////  E N C O D E R  /////
-
 
 void write_secret_message_symbols(FILE* giffy)
 {
@@ -16,6 +14,7 @@ void write_secret_message_symbols(FILE* giffy)
 
 void write_comment_end(FILE* giffy)
 {
+	// if NETSCAPE 2.0 can do it, i can sign my work too
   char signature[7] = "vipyne";
   flockfile(giffy);
   for (int i = 0; signature[i] != '\0'; ++i ) {
@@ -49,7 +48,7 @@ int long write_secret_message(FILE* giffy, char* secret_message)
 
 void write_entire_comment(FILE* giffy, char* secret_message)
 {
-	fseek(giffy, -1L, SEEK_END); // rewind one byte
+	fseek(giffy, -1L, SEEK_END); // rewind and start to write over original trailer
 
   //    C O M M E N T   E X T E N S I O N
   fputc(0x21, giffy); // extension start
@@ -98,7 +97,7 @@ void parse_out_secret_message(FILE* source)
   printf("\n");
 };
 
-/////  E R R O R S  /////
+/////  U T I L  /////
 
 void print_directions(void) {
   printf("\n");
