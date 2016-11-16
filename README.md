@@ -27,7 +27,7 @@ Example
 
   Encode:
 ```
-$ ./giffy.exe e /input/path/to/file /desired/output/my_filename 'hey friend, what is new with you?'
+$ ./giffy.exe e /input/path/to/file /desired/output/my_filename 'hey Lindsay, what is new with you?'
 ```
   Decode:
 ```
