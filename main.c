@@ -5,7 +5,9 @@
 int main(int argc, char* argv[])
 {
   FILE* source = fopen(argv[2], "rb");
+  errno = 0;
   FILE* giffy = fopen(argv[3], "wbx");
+  int overwrite_warning = errno;
   char* secret_message = argv[4];
 
   if (argc != 5) {
@@ -16,7 +18,13 @@ int main(int argc, char* argv[])
       return 1;
     }
   } else {
-    if (errno != 0) {
+    if (source == NULL) {
+      printf("\n");
+      printf("File %s doesn't seem to exist. Please check filepath and spelling. --\n", argv[2]);
+      print_directions();
+      return 3;
+    }
+    if (overwrite_warning != 0) {
       printf("Looks like %s already exists. Please change output filename. --\n", argv[3]);
       print_directions();
       return 4;
@@ -30,13 +38,6 @@ int main(int argc, char* argv[])
       print_directions();
       return 2;
     }
-  }
-
-  if (source == NULL) {
-    printf("\n");
-    printf("File %s doesn't seem to exist. Please check filepath and spelling. --\n", argv[2]);
-    print_directions();
-    return 3;
   }
 
   if (*argv[1] == 'e') {
