@@ -1,0 +1,27 @@
+gif compression links
+
+
+https://www.cs.duke.edu/csed/curious/compression/lzw.html
+
+
+hashtables
+http://pumpkinprogrammer.com/2014/06/21/c-tutorial-intro-to-hash-tables/
+
+
+https://github.com/AndreaOrru/Romhacking/blob/master/BahamutLagoon/lzss.cpp
+
+
+bitwize masking
+
+
+http://commandlinefanatic.com/cgi-bin/showarticle.cgi?article=art011
+
+http://homepages.inf.ed.ac.uk/rbf/BOOKS/PHILLIPS/cips2edsrc/LZW.C
+
+http://giflib.sourceforge.net/whatsinagif/lzw_image_data.html#color_table_size
+
+http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension
+
+https://www.cs.cmu.edu/~cil/lzw.and.gif.txt
+
+https://www.eecis.udel.edu/~amer/CISC651/lzw.and.gif.explained.html
