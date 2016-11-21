@@ -33,7 +33,7 @@ $ ./giffy.exe e /input/path/to/file /desired/output/my_filename 'hey Lindsay, wh
 ```
 $ ./giffy.exe d ~/my_filename
 
-hey friend, what is new with you?
+hey Lindsay, what is new with you?
 
 ```
 
