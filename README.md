@@ -1,7 +1,7 @@
 # giffy
+![this dog has a secret](https://github.com/vipyne/giffy/blob/master/reallyreadme.gif)
+![this dog fell down](https://github.com/vipyne/giffy/blob/master/readme.gif)
 
-![new alt](https://github.com/vipyne/giffy/blob/master/readme.gif)
-![new alt](https://github.com/vipyne/giffy/blob/master/reallyreadme.gif)
 
 Can you tell the difference between these two animated gifs? They *are* different. Open each in a hex editor if you don't believe me or... use this program to decode the secret message in the second one!
 
