@@ -40,84 +40,86 @@ void write_header(FILE* giffy)
   char packed_field;
   char pixel_aspect_ratio;*/
   //    L O G I C A L   S C R E E N   D E S C R I P T O R
+  fputc(0x03, giffy);
   fputc(0x00, giffy);// width
-  fputc(0xFF, giffy);
+  fputc(0x03, giffy);
   fputc(0x00, giffy);// height
-  fputc(0xFF, giffy);
   // _ color table bool | ___ resolution | _ sort flag | ___ size of table
   // size of table == 000 => 2 colors;
-  fputc(0x80, giffy);// packed /// color table options - whether or not has
-  fputc(0x01, giffy);// background color index
+  fputc(0x81, giffy);// packed /// color table options - whether or not has
+  fputc(0x00, giffy);// background color index
   fputc(0x00, giffy);// pixel aspect ratio
 
   //    C O L O R   T A B L E
   // global color table
   // TODO: iterate through the color_table you just made
-  fputc(0x20, giffy);
-  fputc(0x79, giffy);
-  fputc(0x4B, giffy);
+  fputc(0x00, giffy);
+  fputc(0xFF, giffy);
+  fputc(0xFF, giffy);
+
+  fputc(0x88, giffy);
+  fputc(0x88, giffy);
+  fputc(0x11, giffy);
 
   fputc(0x00, giffy);
   fputc(0x00, giffy);
-  fputc(0x4B, giffy);
+  fputc(0x00, giffy);
 
-  // fputc(0xBB, giffy);
-  // fputc(0x13, giffy);
-  // fputc(0x2A, giffy);
-
-  // fputc(0x9A, giffy);
-  // fputc(0x9A, giffy);
-  // fputc(0x75, giffy);
+  fputc(0x00, giffy);
+  fputc(0xFF, giffy);
+  fputc(0x00, giffy);
   // end color table
 
   //    I M A G E   D E S C R I P T O R
   fputc(0x2C, giffy);
   fputc(0x00, giffy);
+  fputc(0x00, giffy);
+  fputc(0x00, giffy);
   fputc(0x00, giffy);// width
-  fputc(0x00, giffy);
+  fputc(0x03, giffy);
   fputc(0x00, giffy);// length
-  fputc(0xFF, giffy);
-  fputc(0x00, giffy);
-  fputc(0xFF, giffy);
+  fputc(0x03, giffy);
   fputc(0x00, giffy);
   fputc(0x00, giffy); // image_descriptor packed_field
    // // not used yet, hard coded for now
   // gif_image_descriptor image_descriptor;
   // image_descriptor.image_width = 0xFF; // need to get image dim... ffmpeg?  vips?
   // image_descriptor.image_height = 0xFF;
+
+  printf(" ^^^^ end of header\n");
 }
 
-void generate_index_stream(FILE* source, char* index_stream)
-{
-  int length = 500;
-  char buffer[length];
-  fread(&buffer, 1, length, source);
+// void generate_index_stream(FILE* source, char* index_stream)
+// {
+//   int length = 500;
+//   char buffer[length];
+//   fread(&buffer, 1, length, source);
 
-  printf("18th byte : %c \n", buffer[17]);
-  printf("start: 19th byte : %c \n", buffer[18]);
+//   printf("18th byte : %c \n", buffer[17]);
+//   printf("start: 19th byte : %c \n", buffer[18]);
 
-  int output_color_table_index = 0;
-	for (int i = 18; output_color_table_index < 10; i += 3) {
-  	char rgb_pattern[3];
-  	rgb_pattern[0] = buffer[i];
-  	rgb_pattern[1] = buffer[i + 1];
-  	rgb_pattern[2] = buffer[i + 2];
+//   int output_color_table_index = 0;
+// 	for (int i = 18; output_color_table_index < 10; i += 3) {
+//   	char rgb_pattern[3];
+//   	rgb_pattern[0] = buffer[i];
+//   	rgb_pattern[1] = buffer[i + 1];
+//   	rgb_pattern[2] = buffer[i + 2];
 
-  	// printf("color_table[0] : %d\n", color_table[0]);
-  	// printf("color_table[3] : %d\n", color_table[3]);
-  	printf("rgb_pattern[0] : %d\n", rgb_pattern[i]);
-  	if (rgb_pattern[0] == color_table[0]) { // first color
-  		index_stream[output_color_table_index] = 0;
-  	}
-  	if (rgb_pattern[0] == color_table[3]) { // second color
-  		index_stream[output_color_table_index] = 1;
-  	}
-  	printf("i_m: %d |", index_stream[output_color_table_index]);
-  	output_color_table_index++;
-  }
-  index_stream[10] = '\0';
-  printf("\n");
-}
+//   	// printf("color_table[0] : %d\n", color_table[0]);
+//   	// printf("color_table[3] : %d\n", color_table[3]);
+//   	printf("rgb_pattern[0] : %d\n", rgb_pattern[i]);
+//   	if (rgb_pattern[0] == color_table[0]) { // first color
+//   		index_stream[output_color_table_index] = 0;
+//   	}
+//   	if (rgb_pattern[0] == color_table[3]) { // second color
+//   		index_stream[output_color_table_index] = 1;
+//   	}
+//   	printf("i_m: %d |", index_stream[output_color_table_index]);
+//   	output_color_table_index++;
+//   }
+//   index_stream[10] = '\0';
+//   printf("\n");
+// }
 
 int verb_hash(char* key_input_color, int hash_table_length) {
 	int value = 0;
@@ -129,21 +131,27 @@ int verb_hash(char* key_input_color, int hash_table_length) {
 	return value % hash_table_length;
 }
 
-// struct key_value_ll {
-// 	int key;
-// 	char value[3];
-// 	struct key_value_ll* next;
-// }
-
 void write_image_data(FILE* source, FILE* giffy)
 {
   //    I M A G E   D A T A
   fputc(0x02, giffy); // LZW min code size - 2
-  fputc(0x16, giffy); // number of bytes in data sub-block
+  fputc(0x0A, giffy); // number of bytes in data sub-block
 
-  char index_stream[11];
+  fputc(0xCC, giffy); //
+  fputc(0xB2, giffy); //
+  fputc(0x2C, giffy); //
+  fputc(0xCB, giffy); //
+  fputc(0xB6, giffy); //
 
-  generate_index_stream(source, index_stream);
+  fputc(0x6D, giffy); //
+  fputc(0xDB, giffy); //
+  fputc(0xB2, giffy); //
+  fputc(0x6C, giffy); //
+  fputc(0xCB, giffy); //
+
+  fputc(0xA2, giffy); //
+
+  // generate_index_stream(source, index_stream);
   // compress_image(giffy, index_stream);
 
   // // array of indexes to color table
@@ -208,12 +216,11 @@ int long write_secret_message(FILE* giffy, char* secret_message)
 
 void write_extensions(FILE* giffy, char* secret_message)
 {
-
-  /*//    P L A I N   T E X T   E X T E N S I O N
+  //    P L A I N   T E X T   E X T E N S I O N
   fputc(0x21, giffy);// plain text extension start
   fputc(0x01, giffy);// plain text label
   fputc(0x00, giffy); // block size (let's try 0 for now but could add something later:shrug_emoji:)
-  fputc(0x00, giffy); */
+  fputc(0x00, giffy);
 
   //    A P P L I C A T I O N   E X T E N S I O N
   /*byte  1        : 33 (hex 0x21) GIF Extension code
