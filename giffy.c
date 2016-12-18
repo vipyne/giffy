@@ -97,7 +97,7 @@ void write_header(FILE* giffy)
   // image_descriptor.image_height = 0xFF;
 }
 
-void write_image_data(FILE* source, FILE* giffy)
+void write_compressed_image_data(FILE* source, FILE* giffy)
 {
   //    I M A G E   D A T A
   fputc(0x02, giffy); // LZW min code size - 2
