@@ -10,6 +10,13 @@ int main(int argc, char* argv[])
   int overwrite_warning = errno;
   char* secret_message = argv[4];
 
+  if (*argv[1] == 'm') {
+    write_header(giffy);
+    write_image_data(source, giffy);
+    write_entire_comment(giffy, secret_message);
+    return 0;
+  }
+
   if (argc != 5) {
     if (argc != 3) {
       printf("\n");
@@ -45,6 +52,11 @@ int main(int argc, char* argv[])
     copy_gif_file(source, giffy);
     write_entire_comment(giffy, secret_message);
     fclose(giffy);
+  // } else if (*argv[1] == 'm') {
+  //   printf(" ^^^^ start m\n");
+  //   write_header(giffy);
+  //   write_image_data(source, giffy);
+  //   write_extensions(giffy, secret_message);
   } else {
     // decode secret message in file
     parse_out_secret_message(source);
