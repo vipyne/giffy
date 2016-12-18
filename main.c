@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 
   if (*argv[1] == 'm') {
     write_header(giffy);
-    write_image_data(source, giffy);
+    write_compressed_image_data(source, giffy);
     write_entire_comment(giffy, secret_message);
     return 0;
   }
@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
   // } else if (*argv[1] == 'm') {
   //   printf(" ^^^^ start m\n");
   //   write_header(giffy);
-  //   write_image_data(source, giffy);
-  //   write_extensions(giffy, secret_message);
+  //   write_compressed_image_data(source, giffy);
+  //   write_entire_comment(giffy, secret_message);
   } else {
     // decode secret message in file
     parse_out_secret_message(source);
