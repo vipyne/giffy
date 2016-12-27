@@ -65,19 +65,19 @@ void write_header(FILE* giffy)
   // TODO: iterate through the color_table you just made
   fputc(0x00, giffy);
   fputc(0xFF, giffy);
-  fputc(0xFF, giffy);
+  fputc(0xFF, giffy);  // 0 Cyan
 
-  fputc(0x88, giffy);
   fputc(0x88, giffy);
   fputc(0x11, giffy);
+  fputc(0x66, giffy);  // 1 Purple
 
   fputc(0x00, giffy);
   fputc(0x00, giffy);
-  fputc(0x00, giffy);
+  fputc(0x00, giffy);  // 2 Black
 
   fputc(0x00, giffy);
   fputc(0xFF, giffy);
-  fputc(0x00, giffy);
+  fputc(0x00, giffy);  // 3 Green
   // end color table
 
   //    I M A G E   D E S C R I P T O R
@@ -99,6 +99,29 @@ void write_header(FILE* giffy)
 
 void write_compressed_image_data(FILE* source, FILE* giffy)
 {
+  // int pixel_color_indeces[] = {1,3,1,3,2,3,1,3,1};
+
+  // unsigned char *binary_arr = calloc(1,sizeof(char)*9);
+
+  // binary_arr[0] = 1;
+  // binary_arr[1] = 3;
+  // binary_arr[2] = 1;
+
+  // struct packed_struct {
+  //   unsigned char one : 1;
+  //   unsigned char two : 1;
+  //   unsigned char three : 1;
+  //   unsigned char four : 1;
+  //   unsigned char five : 1;
+  //   unsigned char six : 1;
+  //   unsigned char seven : 1;
+  //   unsigned char eight : 1;
+  // }
+
+  // how to create a binary stream?
+
+
+
   //    I M A G E   D A T A
   fputc(0x02, giffy); // LZW min code size - 2
   fputc(0x0A, giffy); // number of bytes in data sub-block
@@ -118,6 +141,7 @@ void write_compressed_image_data(FILE* source, FILE* giffy)
   fputc(0xA2, giffy); //
 
   fputc(0x00, giffy); // end image data | end data sub block
+  // fputc(0x00, giffy); // end image data | end data sub block
 }
 
 void compress_image(FILE* giffy, char* index_stream)
@@ -136,7 +160,7 @@ int long write_secret_message(FILE* giffy, char* secret_message)
 
 void write_entire_comment(FILE* giffy, char* secret_message)
 {
-	fseek(giffy, -1L, SEEK_END); // rewind and start to write over original trailer
+	// fseek(giffy, -1L, SEEK_END); // rewind and start to write over original trailer
 
   /*//    P L A I N   T E X T   E X T E N S I O N
   fputc(0x21, giffy);// plain text extension start
