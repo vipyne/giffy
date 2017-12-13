@@ -25,9 +25,11 @@ void write_comment_end(FILE* giffy)
 
 void copy_gif_file(FILE* source, FILE* giffy)
 {
-	fseek(source, 0, SEEK_END);
-	int source_size = ftell(source);
-	rewind(source);
+  fseek(source, 0, SEEK_END);
+  int source_size = ftell(source);
+  rewind(source);
+
+	fseek(source, 4 * sizeof(char), SEEK_SET);
 
 	char *source_buffer = (char*)malloc(sizeof(char) * source_size);
 
@@ -40,61 +42,68 @@ void copy_gif_file(FILE* source, FILE* giffy)
 void write_header(FILE* giffy)
 {
   //    G I F   H E A D E R
-  char gif_header[6] = {'G', 'I' ,'F' , '8', '9', 'a'};
-  for (int i = 0; i < 6; ++i) {
-    fputc(gif_header[i], giffy);
-  }
+  // char gif_header[6] = {'G', 'I' ,'F' , '8', '9', 'a'};
+  // for (int i = 0; i < 6; ++i) {
+  //   fputc(lzip_header[i], giffy);
+  // }
 
-  /*short int canvas_width;  // TODO: ensure this is little endian
-  short int canvas_height;
-  char packed_field;
-  char pixel_aspect_ratio;*/
-  //    L O G I C A L   S C R E E N   D E S C R I P T O R
-  fputc(0x03, giffy);
-  fputc(0x00, giffy);// width
-  fputc(0x03, giffy);
-  fputc(0x00, giffy);// height
-  // _ color table bool | ___ resolution | _ sort flag | ___ size of table
-  // size of table == 000 => 2 colors;
-  fputc(0x81, giffy);// packed /// color table options - whether or not has
-  fputc(0x00, giffy);// background color index
-  fputc(0x00, giffy);// pixel aspect ratio
+  // lzip magic bites
+  fputc(0x4C, giffy);
+  fputc(0x5A, giffy);
+  fputc(0x49, giffy);
+  fputc(0x50, giffy);
+  // fputc(0x01, giffy);
 
-  //    C O L O R   T A B L E
-  // global color table
-  // TODO: iterate through the color_table you just made
-  fputc(0x00, giffy);
-  fputc(0xFF, giffy);
-  fputc(0xFF, giffy);  // 0 Cyan
+  // /*short int canvas_width;  // TODO: ensure this is little endian
+  // short int canvas_height;
+  // char packed_field;
+  // char pixel_aspect_ratio;*/
+  // //    L O G I C A L   S C R E E N   D E S C R I P T O R
+  // fputc(0x03, giffy);
+  // fputc(0x00, giffy);// width
+  // fputc(0x03, giffy);
+  // fputc(0x00, giffy);// height
+  // // _ color table bool | ___ resolution | _ sort flag | ___ size of table
+  // // size of table == 000 => 2 colors;
+  // fputc(0x81, giffy);// packed /// color table options - whether or not has
+  // fputc(0x00, giffy);// background color index
+  // fputc(0x00, giffy);// pixel aspect ratio
 
-  fputc(0x88, giffy);
-  fputc(0x11, giffy);
-  fputc(0x66, giffy);  // 1 Purple
+  // //    C O L O R   T A B L E
+  // // global color table
+  // // TODO: iterate through the color_table you just made
+  // fputc(0x00, giffy);
+  // fputc(0xFF, giffy);
+  // fputc(0xFF, giffy);  // 0 Cyan
 
-  fputc(0x00, giffy);
-  fputc(0x00, giffy);
-  fputc(0x00, giffy);  // 2 Black
+  // fputc(0x88, giffy);
+  // fputc(0x11, giffy);
+  // fputc(0x66, giffy);  // 1 Purple
 
-  fputc(0x00, giffy);
-  fputc(0xFF, giffy);
-  fputc(0x00, giffy);  // 3 Green
-  // end color table
+  // fputc(0x00, giffy);
+  // fputc(0x00, giffy);
+  // fputc(0x00, giffy);  // 2 Black
 
-  //    I M A G E   D E S C R I P T O R
-  fputc(0x2C, giffy);
-  fputc(0x00, giffy);
-  fputc(0x00, giffy);
-  fputc(0x00, giffy);
-  fputc(0x00, giffy);// width
-  fputc(0x03, giffy);
-  fputc(0x00, giffy);// length
-  fputc(0x03, giffy);
-  fputc(0x00, giffy);
-  fputc(0x00, giffy); // image_descriptor packed_field
-   // // not used yet, hard coded for now
-  // gif_image_descriptor image_descriptor;
-  // image_descriptor.image_width = 0xFF; // need to get image dim... ffmpeg?  vips?
-  // image_descriptor.image_height = 0xFF;
+  // fputc(0x00, giffy);
+  // fputc(0xFF, giffy);
+  // fputc(0x00, giffy);  // 3 Green
+  // // end color table
+
+  // //    I M A G E   D E S C R I P T O R
+  // fputc(0x2C, giffy);
+  // fputc(0x00, giffy);
+  // fputc(0x00, giffy);
+  // fputc(0x00, giffy);
+  // fputc(0x00, giffy);// width
+  // fputc(0x03, giffy);
+  // fputc(0x00, giffy);// length
+  // fputc(0x03, giffy);
+  // fputc(0x00, giffy);
+  // fputc(0x00, giffy); // image_descriptor packed_field
+  //  // // not used yet, hard coded for now
+  // // gif_image_descriptor image_descriptor;
+  // // image_descriptor.image_width = 0xFF; // need to get image dim... ffmpeg?  vips?
+  // // image_descriptor.image_height = 0xFF;
 }
 
 void write_compressed_image_data(FILE* source, FILE* giffy)

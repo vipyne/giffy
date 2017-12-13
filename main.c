@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
 
   if (*argv[1] == 'm') {
     write_header(giffy);
+    printf("herer?\n");
     write_compressed_image_data(source, giffy);
     write_entire_comment(giffy, secret_message);
     return 0;
@@ -49,9 +50,11 @@ int main(int argc, char* argv[])
 
   if (*argv[1] == 'e') {
     // encode secret message in file
+    printf("writing magic bites\n");
+    write_header(giffy);
     copy_gif_file(source, giffy);
-    write_entire_comment(giffy, secret_message);
-    fclose(giffy);
+    // write_entire_comment(giffy, secret_message);
+    // fclose(giffy);
   // } else if (*argv[1] == 'm') {
   //   printf(" ^^^^ start m\n");
   //   write_header(giffy);
