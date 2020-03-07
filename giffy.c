@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <emscripten.h>
 #include "giffy.h"
 
 /////  E N C O D E R  /////
@@ -23,19 +24,20 @@ void write_comment_end(FILE* giffy)
   fputc(0x00, giffy);
 }
 
-void copy_gif_file(FILE* source, FILE* giffy)
-{
-	fseek(source, 0, SEEK_END);
-	int source_size = ftell(source);
-	rewind(source);
+// EMSCRIPTEN_KEEPALIVE
+// void copy_gif_file(FILE* source, FILE* giffy)
+// {
+// 	fseek(source, 0, SEEK_END);
+// 	int source_size = ftell(source);
+// 	rewind(source);
 
-	char *source_buffer = (char*)malloc(sizeof(char) * source_size);
+// 	char *source_buffer = (char*)malloc(sizeof(char) * source_size);
 
-	for (int i = 0; i < source_size; ++i) {
-		fread(source_buffer, sizeof(char), source_size, source);
-		fputc(source_buffer[i], giffy);
-  }
-}
+// 	for (int i = 0; i < source_size; ++i) {
+// 		fread(source_buffer, sizeof(char), source_size, source);
+// 		fputc(source_buffer[i], giffy);
+//   }
+// }
 
 void write_header(FILE* giffy)
 {
